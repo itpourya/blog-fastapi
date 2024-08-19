@@ -12,3 +12,8 @@ class RegisterInputs(BaseModel):
 class UpdateUsernameInput(BaseModel):
     old_username: str
     new_username: str
+
+
+class DeleteUserInput(BaseModel):
+    username: str
+    password: str
