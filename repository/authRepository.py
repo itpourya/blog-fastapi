@@ -1,12 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from model.usersModel import User
-from schema.inputs import RegisterInputs, UpdateUsernameInput
+from schema.inputs import RegisterInputs, UpdateUsernameInput, DeleteUserInput
 from sqlalchemy.ext.asyncio import AsyncSession
+from exception.exceptions import UserNotFound
 import sqlalchemy
 
 
 class UserRepository:
-    def __init__(self, data: RegisterInputs | UpdateUsernameInput, db_session: AsyncSession):
+    def __init__(self, data: RegisterInputs | UpdateUsernameInput | DeleteUserInput, db_session: AsyncSession) -> None:
         self.session = db_session
         self.data = data
 
@@ -26,12 +27,18 @@ class UserRepository:
             user_data = await session.scalar(query)
 
             if user_data is None:
-                raise ValueError("User not found")
+                raise UserNotFound
 
             await session.execute(update_query)
             await session.commit()
             user_data.username = self.data.new_username
             return user_data
 
-    def delete_user(self):
-        ...
+    async def delete_user(self) -> bool:
+        query = sqlalchemy.delete(User).where(User.username == self.data.username, User.password == self.data.password)
+
+        async with self.session as session:
+            await session.execute(query)
+            await session.commit()
+
+        return True
