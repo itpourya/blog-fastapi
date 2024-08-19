@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
-from schema.inputs import RegisterInputs, UpdateUsernameInput
+from schema.inputs import RegisterInputs, UpdateUsernameInput, DeleteUserInput
 from database.engine import get_db
 from service.authService import UserService
 
@@ -25,3 +25,11 @@ async def update(db_session: Annotated[AsyncSession, Depends(get_db)], data: Upd
     service = UserService(data=data, session=db_session)
     user = await service.update()
     return user
+
+
+@user_router.delete("/delete")
+async def delete(db_session: Annotated[AsyncSession, Depends(get_db)], data: DeleteUserInput = Body()):
+    service = UserService(data=data, session=db_session)
+    status = await service.delete()
+
+    return status
