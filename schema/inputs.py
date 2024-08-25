@@ -17,3 +17,12 @@ class UpdateUsernameInput(BaseModel):
 class DeleteUserInput(BaseModel):
     username: str
     password: str
+
+
+class LoginInput(BaseModel):
+    username: str
+    password: str
+
+
+class GetUserInput(BaseModel):
+    username: str
